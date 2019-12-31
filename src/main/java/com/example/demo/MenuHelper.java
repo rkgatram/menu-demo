@@ -2,6 +2,7 @@ package com.example.demo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -64,23 +65,35 @@ public class MenuHelper {
 		
 	public void deepSearch(List<MenuBean> menuBeans, Menu menu) {
 		
-		for(MenuBean mb : menuBeans) {
+		/*
+			Optional<MenuBean> matchedBean = menuBeans.stream().filter(mb -> mb.getLinkId() == menu.getParentId()).findFirst();
 			
+			if(matchedBean.isPresent()) {
+				addMenuItem(matchedBean.get(), menu);
+			}
+		*/
+		
+		
+		menuBeans.forEach(mb -> {
 			if(mb.getLinkId() == menu.getParentId()) {
-				MenuBean temp = new MenuBean();
-				temp.setName(menu.getName());
-				temp.setLinkId(menu.getLinkId());
-				if(mb.getSubMenus() == null) {
-					mb.setSubMenus(new ArrayList<>());
-				}
-				mb.getSubMenus().add(temp);
-				break;
+				addMenuItem(mb, menu);
+				//break;
 			}else {
 				if(mb.getSubMenus() != null && !mb.getSubMenus().isEmpty()) {
 					// if menuBean has subMenus
 					deepSearch(mb.getSubMenus(), menu);
 				}
 			}
+		});
+	}
+	
+	private void addMenuItem(MenuBean mb, Menu menu) {
+		MenuBean temp = new MenuBean();
+		temp.setName(menu.getName());
+		temp.setLinkId(menu.getLinkId());
+		if(mb.getSubMenus() == null) {
+			mb.setSubMenus(new ArrayList<>());
 		}
+		mb.getSubMenus().add(temp);
 	}
 }
